@@ -128,4 +128,71 @@ public class Web2Wave {
         }
     }
 
+    public func updateUserProperty(userID: String, property: String, value: String) async -> Result<Void, Error> {
+        
+        assert(nil != baseURL, "You have to initialize base URL before use")
+        assert(nil != apiKey, "You have to initialize apiKey before use")
+        
+        var urlComponents = URLComponents(url: baseURL!.appendingPathComponent("api")
+                                                            .appendingPathComponent("user")
+                                                            .appendingPathComponent("properties"),
+                                          resolvingAgainstBaseURL: false)
+
+        urlComponents?.queryItems = [URLQueryItem(name: "user", value: userID)]
+
+        guard let url = urlComponents?.url else {
+            #if DEBUG
+            fatalError("Invalid URL components")
+            #else
+            print("Invalid URL components")
+            return .failure(NSError(domain: "Web2WaveError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid URL components"]))
+            #endif
+        }
+
+        let body = ["property": property, "value": value]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: body, options: []) else {
+            print("Failed to create JSON data")
+            return .failure(NSError(domain: "Web2WaveError", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Failed to create JSON data"]))
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(apiKey!, forHTTPHeaderField: "api-key")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+        request.httpBody = jsonData
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                
+                guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+                      let responseDict = jsonObject as? [String: Any],
+                      let success = responseDict["result"] as? String? else
+                {
+                    return .failure(NSError(domain: "Web2WaveError", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Smth wrong"]))
+                }
+                
+                if (success == "1") {
+                    return .success(())
+                }
+                else {
+                    return .failure(NSError(domain: "Web2WaveError", code: 1004, userInfo: [NSLocalizedDescriptionKey: "Smth wrong"]))
+                }
+                
+            } else {
+                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                return .failure(NSError(domain: "Web2WaveError", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "Unexpected status code: \(statusCode)"]))
+            }
+            
+        } catch {
+            return .failure(error)
+        }
+    }
+
+
+    
 }
