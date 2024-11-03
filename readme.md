@@ -93,18 +93,6 @@ Updates a specific property for a user.
 - Swift 5.5+
 - Xcode 13.0+
 
-## Error Handling
-
-The package includes built-in error handling with custom error domains:
-- Invalid URL components (1001)
-- JSON serialization errors (1002)
-- Response parsing errors (1003, 1004)
-- Network status codes
-
-## Thread Safety
-
-The package is designed to be thread-safe and uses `@MainActor` for shared instance management.
-
 ## License
 
 MIT
