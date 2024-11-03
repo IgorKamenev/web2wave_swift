@@ -1,15 +1,15 @@
 # Web2Wave
 
-Web2Wave is a Swift package that provides a simple interface for managing user subscriptions and properties through a REST API. It offers convenient methods to check subscription statuses and fetch user properties asynchronously.
+Web2Wave is a lightweight Swift package that provides a simple interface for managing user subscriptions and properties through a REST API.
 
 ## Features
 
 - Fetch subscription status for users
-- Check if a user has an active subscription
-- Retrieve user properties
-- Built with modern Swift async/await
-- Singleton pattern for easy access
-- Thread-safe with `@MainActor`
+- Check for active subscriptions
+- Manage user properties
+- Thread-safe singleton design
+- Async/await API support
+- Built-in error handling
 
 ## Installation
 
@@ -25,10 +25,9 @@ dependencies: [
 
 ## Setup
 
-Before using Web2Wave, you need to configure it with your base URL and API key:
+Before using Web2Wave, you need to configure the base URL and API key:
 
 ```swift
-// Initialize Web2Wave
 Web2Wave.shared.baseURL = URL(string: "[whatever].web2wave.com/quiz/[without api etc.]")
 Web2Wave.shared.apiKey = "your-api-key"
 ```
@@ -39,87 +38,54 @@ Web2Wave.shared.apiKey = "your-api-key"
 
 ```swift
 // Fetch detailed subscription status
-let userID = "user123"
-if let subscriptionStatus = await Web2Wave.shared.fetchSubscriptionStatus(userID: userID) {
-    print("Subscription details: \(subscriptionStatus)")
-}
+let status = await Web2Wave.shared.fetchSubscriptionStatus(userID: "user123")
 
-// Check if user has active subscription
-let isActive = await Web2Wave.shared.hasActiveSubscription(userID: userID)
-if isActive {
-    print("User has an active subscription")
-} else {
-    print("User does not have an active subscription")
-}
+// Check if user has an active subscription
+let isActive = await Web2Wave.shared.hasActiveSubscription(userID: "user123")
 ```
 
-### Fetching User Properties
+### Managing User Properties
 
 ```swift
-let userID = "user123"
-if let properties = await Web2Wave.shared.fetchUserProperties(userID: userID) {
-    // Access individual properties
-    if let userLevel = properties["user_level"] {
-        print("User level: \(userLevel)")
-    }
-    
-    // Print all properties
-    for (key, value) in properties {
-        print("\(key): \(value)")
-    }
+// Fetch user properties
+if let properties = await Web2Wave.shared.fetchUserProperties(userID: "user123") {
+    print("User properties: \(properties)")
+}
+
+// Update a user property
+let result = await Web2Wave.shared.updateUserProperty(
+    userID: "user123",
+    property: "preferredTheme",
+    value: "dark"
+)
+
+switch result {
+case .success:
+    print("Property updated successfully")
+case .failure(let error):
+    print("Failed to update property: \(error)")
 }
 ```
 
-## Response Types
+## API Reference
 
-### Subscription Status Response
+### `Web2Wave.shared`
 
-The subscription status endpoint returns a dictionary containing user information and subscription details:
+The singleton instance of the Web2Wave client.
 
-```swift
-{
-    "user_id": "user123",
-    "user_email": "user@example.com",
-    "subscription": [
-        {
-            "status": "active",
-            // other subscription fields
-        }
-    ]
-}
-```
+### Methods
 
-### User Properties Response
+#### `fetchSubscriptionStatus(userID: String) async -> [String: Any]?`
+Fetches the subscription status for a given user ID.
 
-The user properties endpoint returns an array of property key-value pairs:
+#### `hasActiveSubscription(userID: String) async -> Bool`
+Checks if the user has an active subscription (including trial status).
 
-```swift
-{
-    "properties": [
-        {
-            "property": "user_level",
-            "value": "premium"
-        }
-    ]
-}
-```
+#### `fetchUserProperties(userID: String) async -> [String: String]?`
+Retrieves all properties associated with a user.
 
-## Error Handling
-
-The package includes built-in error handling and will return `nil` in case of:
-- Network errors
-- Invalid API responses
-- Missing or malformed data
-
-Make sure to handle potential `nil` returns appropriately in your code:
-
-```swift
-if let subscriptionStatus = await Web2Wave.shared.fetchSubscriptionStatus(userID: userID) {
-    // Handle successful response
-} else {
-    // Handle error case
-}
-```
+#### `updateUserProperty(userID: String, property: String, value: String) async -> Result<Void, Error>`
+Updates a specific property for a user.
 
 ## Requirements
 
@@ -127,18 +93,22 @@ if let subscriptionStatus = await Web2Wave.shared.fetchSubscriptionStatus(userID
 - Swift 5.5+
 - Xcode 13.0+
 
+## Error Handling
+
+The package includes built-in error handling with custom error domains:
+- Invalid URL components (1001)
+- JSON serialization errors (1002)
+- Response parsing errors (1003, 1004)
+- Network status codes
+
 ## Thread Safety
 
-Web2Wave is designed to be thread-safe and uses `@MainActor` to ensure proper concurrency handling. All API calls are asynchronous and should be called using `await`.
+The package is designed to be thread-safe and uses `@MainActor` for shared instance management.
 
 ## License
 
-[Your chosen license]
+MIT
 
 ## Author
 
 Igor Kamenev
-
-## Contributing
-
-[Your contribution guidelines]
