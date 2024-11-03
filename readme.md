@@ -19,7 +19,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "your-repository-url/Web2Wave.git", from: "1.0.0")
+    .package(url: "https://github.com/IgorKamenev/web2wave_swift.git", from: "1.0.0")
 ]
 ```
 
@@ -29,7 +29,7 @@ Before using Web2Wave, you need to configure it with your base URL and API key:
 
 ```swift
 // Initialize Web2Wave
-Web2Wave.shared.baseURL = URL(string: "https://your-api-base-url.com")
+Web2Wave.shared.baseURL = URL(string: "[whatever].web2wave.com/quiz/[without api etc.]")
 Web2Wave.shared.apiKey = "your-api-key"
 ```
 
