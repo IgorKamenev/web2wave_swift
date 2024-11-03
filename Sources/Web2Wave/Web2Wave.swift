@@ -15,12 +15,12 @@ struct Web2WaveSubscriptionStatus {
 
 class Web2Wave {
     
-    @MainActor static let shared = Web2Wave()
+    @MainActor public static let shared = Web2Wave()
     
-    var baseURL: URL?
-    var apiKey: String?
+    public var baseURL: URL?
+    public var apiKey: String?
         
-    func fetchSubscriptionStatus(userID: String) async -> [String: Any]? {
+    public func fetchSubscriptionStatus(userID: String) async -> [String: Any]? {
 
         assert(nil != baseURL, "You have to initialize base URL before use")
         assert(nil != apiKey, "You have to initialize apiKey before use")
@@ -60,7 +60,7 @@ class Web2Wave {
         }
     }
     
-    func hasActiveSubscription(userID: String) async -> Bool {
+    public func hasActiveSubscription(userID: String) async -> Bool {
         
         if let subscriptionStatus = await fetchSubscriptionStatus(userID: userID) {
             
@@ -81,7 +81,7 @@ class Web2Wave {
         return false
     }
 
-    func fetchUserProperties(userID: String) async -> [String: String]? {
+    public func fetchUserProperties(userID: String) async -> [String: String]? {
 
         assert(nil != baseURL, "You have to initialize base URL before use")
         assert(nil != apiKey, "You have to initialize apiKey before use")
