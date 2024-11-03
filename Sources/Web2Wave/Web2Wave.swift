@@ -13,7 +13,7 @@ struct Web2WaveSubscriptionStatus {
     let subscriptions: [[String: Any]]
 }
 
-class Web2Wave {
+public class Web2Wave {
     
     @MainActor public static let shared = Web2Wave()
     
